@@ -37,7 +37,7 @@ int main(){
   };
 
   DDRD = 0xFF; // segmenty wyświetlacza
-  DDRC != 0x0F; // PC0-PC3 jako wyjścia (sterowanie cyframi)
+  DDRC |= 0x0F; // PC0-PC3 jako wyjścia (sterowanie cyframi)
 
   // przyciski jako wejścia (PB0-PB3)
   cbi(DDRB, PB0);
@@ -58,37 +58,37 @@ int main(){
   uint16_t czas = 0;
   uint8_t stan_odliczania = 0;
   uint8_t licznik_cykli = 0;
-  uint16_t czas_buzzera = 0; 
+  uint16_t czas_dzwonienia = 0; 
 
   while(1) {
     uint8_t d1 = czas / 1000;
     uint8_t d2 = (czas / 100) % 10;
     uint8_t d3 = (czas / 10) % 10;
-    uint8_t d4 = czas % 1000;
+    uint8_t d4 = czas % 10;
 
     //1. Wyświetlanie zmiennej czas
     // 1 cyfra
     PORTC &= ~0x0F;
     PORTD = tab[d1];
-    sbi(PORTC, PC0)
+    sbi(PORTC, PC0);
     _delay_ms(5);    
     
     // 2 cyfra
     PORTC &= ~0x0F;
     PORTD = tab[d2];
-    sbi(PORTC, PC1)
+    sbi(PORTC, PC1);
     _delay_ms(5);    
     
     // 3 cyfra
     PORTC &= ~0x0F;
     PORTD = tab[d3];
-    sbi(PORTC, PC2)
+    sbi(PORTC, PC2);
     _delay_ms(5);
     
     // 4 cyfra
     PORTC &= ~0x0F;
     PORTD = tab[d4];
-    sbi(PORTC, PC3)
+    sbi(PORTC, PC3);
     _delay_ms(5);
 
     // razem 20ms
@@ -103,7 +103,7 @@ int main(){
         } else {
           // koniec czasu!
           stan_odliczania = 0;
-          czas_dzwonienia = 100; // 2 sekundy = 100 * 2ms
+          czas_dzwonienia = 100; // 2 sekundy = 100 * 20ms
           sbi(PORTB, PB4);
         }
       }
@@ -131,13 +131,13 @@ int main(){
         czas = 0;
       }
 
-      if (stan_odliczzania == 0) {
+      if (stan_odliczania == 0) {
         //SW1
         if (bit_is_clear(PINB, PB0)) {
           czas += 1;
           if (czas > 9999)
           {
-            czas == 9999;
+            czas = 9999;
           }
         }
         //SW2
@@ -145,8 +145,9 @@ int main(){
           czas += 10;
           if (czas > 9999)
           {
-            czas == 9999;
+            czas = 9999;
           }
+        }
       }
     }
   }

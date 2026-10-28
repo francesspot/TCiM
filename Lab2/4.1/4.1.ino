@@ -49,31 +49,31 @@ int main(){
     uint8_t tysiace = liczba / 1000;
     uint8_t setki = (liczba / 100) % 10;
     uint8_t dziesiatki = (liczba / 10) % 10;
-    uint8_t jednosci = liczba % 1000;
+    uint8_t jednosci = liczba % 10;
 
 
     // 1 liczba
     PORTC &= ~0x0F;
     PORTD = tab[tysiace];
-    sbi(PORTC, PC0)
+    sbi(PORTC, PC0);
     _delay_ms(5);    
     
     // 2 liczba
     PORTC &= ~0x0F;
     PORTD = tab[setki];
-    sbi(PORTC, PC1)
+    sbi(PORTC, PC1);
     _delay_ms(5);    
     
     // 3 liczba
     PORTC &= ~0x0F;
     PORTD = tab[dziesiatki];
-    sbi(PORTC, PC2)
+    sbi(PORTC, PC2);
     _delay_ms(5);
     
     // 4 liczba
     PORTC &= ~0x0F;
     PORTD = tab[jednosci];
-    sbi(PORTC, PC3)
+    sbi(PORTC, PC3);
     _delay_ms(5);
   }
 }

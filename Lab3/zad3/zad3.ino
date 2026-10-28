@@ -57,7 +57,7 @@ int main(){
   }
 }
 
-ISR(TIME1_COMPA_vect) {
+ISR(TIMER1_COMPA_vect) {
   tbi(PORTD, PD1);
 }
 

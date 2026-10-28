@@ -50,10 +50,10 @@ ISR(TIMER0_OVF_vect) {
   PORTC |= 0x0F;
 
   int temp = liczba;
-  uint8_t d1 = czas / 1000;
-  uint8_t d2 = (czas / 100) % 10;
-  uint8_t d3 = (czas / 10) % 10;
-  uint8_t d4 = czas % 10;
+  uint8_t d1 = temp / 1000;
+  uint8_t d2 = (temp / 100) % 10;
+  uint8_t d3 = (temp / 10) % 10;
+  uint8_t d4 = temp % 10;
 
   switch(aktualny_wyswietlacz) {
     case 0:
@@ -61,26 +61,26 @@ ISR(TIMER0_OVF_vect) {
       cbi(PORTC, PC0); // Aktywacja jedności
       break;
     case 1:
-      // Jeśli liczba jest mniejsza niż 10, wygaszamy zero wiodące
-      if (liczba > 9) 
-      {
-        PORTB = tab[d3]
-      }; else {
+      // Wygaszenie zera wiodącego dla liczb mniejszych niż 10
+      if (temp > 9) {
+        PORTB = tab[d3];
+      } else {
         PORTB = 0x00;
-        cbi(PORTC, PC1); // Aktywacja dziesiątek
-        break;
+      }
+      cbi(PORTC, PC1); // Aktywacja dziesiątek
+      break;
     case 2:
-      if (liczba > 99) {
-        PORTB = tab[d2]
-        }; else {
-          PORTB = 0x00;
-        }
-        cbi(PORTC, PC2); // Aktywacja setek
-        break;
+      if (temp > 99) {
+        PORTB = tab[d2];
+      } else {
+        PORTB = 0x00;
+      }
+      cbi(PORTC, PC2); // Aktywacja setek
+      break;
     case 3:
-      if (liczba > 999) {
-        PORTB = tab[d1]
-      }; else {
+      if (temp > 999) {
+        PORTB = tab[d1];
+      } else {
         PORTB = 0x00;
       }
       cbi(PORTC, PC3); // Aktywacja tysięcy
