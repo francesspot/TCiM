@@ -1,0 +1,29 @@
+#include <avr/io.h>
+#include <util/delay.h>
+
+// Tablica cyfr (wspólna katoda)
+uint8_t cyfry[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
+
+void wyswietl_liczbe(uint16_t liczba) {
+    uint8_t segmenty[4];
+    segmenty[0] = liczba / 1000;       // Tysiące
+    segmenty[1] = (liczba / 100) % 10; // Setki
+    segmenty[2] = (liczba / 10) % 10;  // Dziesiątki
+    segmenty[3] = liczba % 10;         // Jedności
+
+    for (uint8_t i = 0; i < 4; i++) {
+        PORTC = 0x0F;                  // Wyłącz wszystkie (stan wysoki na S1-S4)
+        PORTD = cyfry[segmenty[i]];    // Ustaw wzór cyfry na PORTD
+        PORTC &= ~(1 << i);            // Włącz i-tą cyfrę (stan niski na odpowiedni pin PC)
+        _delay_ms(2);                  // Krótkie opóźnienie (częstotliwość odświeżania)
+    }
+}
+
+int main(void) {
+    DDRD = 0xFF; // Segmenty a-g jako wyjścia
+    DDRC = 0x0F; // Sterowanie S1-S4 (PC0-PC3) jako wyjścia
+
+    while (1) {
+        wyswietl_liczbe(1234); // Wyświetla na stałe liczbę 1234
+    }
+}

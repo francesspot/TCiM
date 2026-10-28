@@ -1,0 +1,62 @@
+#include <avr/io.h>
+#include <util/delay.h>
+
+uint8_t cyfry[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
+int16_t czas = 0;
+uint8_t aktywny = 0;
+
+void odswiez_wyswietlacz(int val) {
+    uint8_t d[4] = {val/1000, (val/100)%10, (val/10)%10, val%10};
+    for (uint8_t i = 0; i < 4; i++) {
+        PORTC = 0x0F; 
+        PORTD = cyfry[d[i]];
+        PORTC &= ~(1 << i);
+        _delay_ms(1); // Mniejszy delay dla płynności przy sprawdzaniu przycisków
+    }
+}
+
+int main(void) {
+    DDRD = 0xFF; // Segmenty
+    DDRC = 0x0F; // S1-S4
+    DDRB &= ~((1 << PB0) | (1 << PB1) | (1 << PB2)); // SW2, SW3, SW4 jako wejścia
+    PORTB |= (1 << PB0) | (1 << PB1) | (1 << PB2);   // Pull-up
+    DDRB |= (1 << PB3); // Buzzer na PB3
+
+    uint16_t licznik_ms = 0;
+
+    while (1) {
+        odswiez_wyswietlacz(czas);
+
+        // SW2 (PB0) - Dodaj 10 sekund (tylko w trybie ustawiania)
+        if (!(PINB & (1 << PB0)) && !aktywny) {
+            czas += 10;
+            if (czas > 9999) czas = 9999;
+            _delay_ms(150); 
+        }
+
+        // SW4 (PB2) - START
+        if (!(PINB & (1 << PB2))) aktywny = 1;
+
+        // SW3 (PB1) - RESET / STOP
+        if (!(PINB & (1 << PB1))) {
+            aktywny = 0;
+            czas = 0;
+        }
+
+        // Logika odliczania (co 1 sekundę)
+        if (aktywny && czas > 0) {
+            licznik_ms += 4; // Przybliżony czas pętli (4 cyfry * 1ms)
+            if (licznik_ms >= 1000) {
+                czas--;
+                licznik_ms = 0;
+            }
+        } 
+        // Koniec czasu - Alarm
+        else if (aktywny && czas == 0) {
+            PORTB |= (1 << PB3); // Buzzer ON
+            for(int i=0; i<500; i++) odswiez_wyswietlacz(0); // Alarm przez ok. 2s
+            PORTB &= ~(1 << PB3); // Buzzer OFF
+            aktywny = 0;
+        }
+    }
+}

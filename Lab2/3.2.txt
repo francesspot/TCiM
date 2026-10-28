@@ -1,0 +1,29 @@
+#include <avr/io.h>
+#include <util/delay.h>
+
+// Tablica wzorców dla cyfr 0-9 (segmenty a-g na PD0-PD6)
+uint8_t cyfry[10] = {
+    0x3F, // 0
+    0x06, // 1
+    0x5B, // 2
+    0x4F, // 3
+    0x66, // 4
+    0x6D, // 5
+    0x7D, // 6
+    0x07, // 7
+    0x7F, // 8
+    0x6F  // 9
+};
+
+int main(void) {
+    DDRD = 0xFF;           // PORTD jako wyjścia (segmenty)
+    DDRC |= (1 << PC0);    // PC0 jako wyjście (sterowanie S1)
+    PORTC &= ~(1 << PC0);  // Aktywacja pierwszej cyfry (S1 do GND)
+
+    while (1) {
+        for (uint8_t i = 0; i < 10; i++) {
+            PORTD = cyfry[i]; // Ustawienie segmentów z tablicy
+            _delay_ms(1000);  // Czekaj 1 sekundę
+        }
+    }
+}

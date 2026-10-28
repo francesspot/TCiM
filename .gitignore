@@ -1,0 +1,14 @@
+# KiCad: kopie zapasowe, lokalna historia, pliki tymczasowe
+*-backups/
+*-20??-??-??_*.zip
+.history/
+*.lck
+fp-info-cache
+*.kicad_prl
+_autosave-*
+\#auto_saved_files#
+
+# Arduino / build
+build/
+*.hex
+*.elf
